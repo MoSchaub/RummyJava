@@ -5,11 +5,14 @@ import javafx.scene.*;
 import javafx.scene.image.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.control.*;
 import javafx.fxml.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.stage.*;
+import javafx.scene.media.*;
 
 import java.util.ArrayList;
 
@@ -51,8 +54,9 @@ public class SecondController {
                 hstack2.getChildren().clear();
                 hstack2.setSpacing(0);
 
-                // TODO: Async
-                updateStones();
+                new Thread(() -> {
+                        this.updateStones();
+                }).run();
         }
 
         private void setUpTischGrid() {
@@ -168,7 +172,17 @@ public class SecondController {
         public void ziehen(ActionEvent actionEvent) {
                 Player player = game.getPlayer(playerId);
                 game.zieheStein(player);
-                this.updateStones();
+                new Thread(() -> {
+                        this.updateStones();
+                }).run();
+
+                new Thread(() -> {
+                        final Media media = new Media(
+                                        getClass().getResource("/SpieleSound/KarteziehenSound.mp3").toString());
+
+                        MediaPlayer mediaPlayer = new MediaPlayer(media);
+                        mediaPlayer.play();
+                }).start();
 
         }
 
