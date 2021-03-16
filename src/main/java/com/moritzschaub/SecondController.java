@@ -192,14 +192,15 @@ public class SecondController {
                         this.updateStones();
                 }).run();
 
-                new Thread(() -> {
-                        final Media media = new Media(
-                                        getClass().getResource("/SpieleSound/KarteziehenSound.mp3").toString());
+                if (this.sound) {
+                        new Thread(() -> {
+                                final Media media = new Media(
+                                                getClass().getResource("/SpieleSound/KarteziehenSound.mp3").toString());
 
-                        MediaPlayer mediaPlayer = new MediaPlayer(media);
-                        mediaPlayer.play();
-                }).start();
-
+                                MediaPlayer mediaPlayer = new MediaPlayer(media);
+                                mediaPlayer.play();
+                        }).start();
+                }
         }
 
         public void setGame(Game game) {
@@ -215,11 +216,20 @@ public class SecondController {
         }
 
         public void toggleSoundHandler(ActionEvent actionEvent) {
-                System.out.println("toggleSound");
-                Image image = new Image(getClass().getResource("/SoundOff.png").toString());
-                ImageView imageView = (ImageView) this.soundButton.getGraphic();// getChildren().get(0)
-                imageView.setImage(image);
+                // toggleSound
                 sound = !sound;
+
+                // change the image
+                Image soundOffImage = new Image(getClass().getResource("/SoundOff.png").toString());
+                Image soundOnImage = new Image(getClass().getResource("/SoundOn.png").toString());
+                if (sound) {
+                        ImageView imageView = (ImageView) this.soundButton.getGraphic();// getChildren().get(0)
+                        imageView.setImage(soundOffImage);
+                } else {
+                        ImageView imageView = (ImageView) this.soundButton.getGraphic();// getChildren().get(0)
+                        imageView.setImage(soundOnImage);
+                }
+
         }
 
         public void openFirstScene(ActionEvent actionEvent) {
