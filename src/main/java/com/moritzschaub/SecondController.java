@@ -75,6 +75,19 @@ public class SecondController {
                                         /* allow for moving */
                                         event.acceptTransferModes(TransferMode.MOVE);
 
+                                        ArrayList<Stone> steine = new ArrayList<Stone>();
+                                        steine.add(draggingStone);
+                                        game.neueReiheMitSteinen(steine);
+
+                                        for (int i = 0; i < game.getTisch().size(); i++) {
+                                                for (int j = 0; j < game.getTisch().get(i).getStones().size(); i++) {
+                                                        if (hstack.getChildren().remove(draggingRectangle)) {
+                                                                tableGrid.setConstraints(draggingRectangle, i, j);
+                                                                tableGrid.addRow(j, draggingRectangle);
+                                                                updateStones();
+                                                        }
+                                                }
+                                        }
                                         // remove rect from hstack and add it to the grid
                                         // hstack.getChildren().remove(draggingRectangle);
                                         // tableGrid.getChildren().add(draggingRectangle);
@@ -146,21 +159,24 @@ public class SecondController {
 
                         rect.setOnDragDetected(new EventHandler<MouseEvent>() {
                                 public void handle(MouseEvent event) {
-                                        /* drag was detected, start a drag-and-drop gesture */
-                                        /* allow any transfer mode */
-                                        Dragboard db = rect.startDragAndDrop(TransferMode.ANY);
+                                        if (event.getSource() != tableGrid) {
+                                                /* drag was detected, start a drag-and-drop gesture */
+                                                /* allow any transfer mode */
+                                                Dragboard db = rect.startDragAndDrop(TransferMode.ANY);
 
-                                        /* Put a string on a dragboard */
-                                        ClipboardContent content = new ClipboardContent();
+                                                /* Put a string on a dragboard */
+                                                ClipboardContent content = new ClipboardContent();
 
-                                        Image clipImage = new Image(stone.getFilePath(), width, height, true, true);
-                                        draggingStone = stone;
-                                        draggingRectangle = rect;
+                                                Image clipImage = new Image(stone.getFilePath(), width, height, true,
+                                                                true);
+                                                draggingStone = stone;
+                                                draggingRectangle = rect;
 
-                                        content.putImage(clipImage);
-                                        db.setContent(content);
+                                                content.putImage(clipImage);
+                                                db.setContent(content);
 
-                                        event.consume();
+                                                event.consume();
+                                        }
                                 }
                         });
 
@@ -198,7 +214,11 @@ public class SecondController {
                 firstScene = scene;
         }
 
-        public void toggleSoundHandler() {
+        public void toggleSoundHandler(ActionEvent actionEvent) {
+                System.out.println("toggleSound");
+                Image image = new Image(getClass().getResource("/SoundOff.png").toString());
+                ImageView imageView = (ImageView) this.soundButton.getGraphic();// getChildren().get(0)
+                imageView.setImage(image);
                 sound = !sound;
         }
 

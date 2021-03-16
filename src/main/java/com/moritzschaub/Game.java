@@ -87,4 +87,8 @@ public class Game {
         return null;
     }
 
+    public ArrayList<Reihe> getTisch() {
+        return this.tisch;
+    }
+
 }

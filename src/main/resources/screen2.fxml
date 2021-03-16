@@ -28,10 +28,17 @@
           <MenuItem mnemonicParsing="false" onAction="#openFirstScene" text="Spiel verlassen" />
         </items>
       </SplitMenuButton>
-      <Button fx:id="soundButton" layoutX="1719.0" layoutY="18.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="120.0" text="Sound" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="40.0">
+      <Button fx:id="soundButton" layoutX="1755.0" layoutY="36.0" onAction="#toggleSoundHandler"  mnemonicParsing="false" prefHeight="51.0" prefWidth="51.0" AnchorPane.rightAnchor="114.0" AnchorPane.topAnchor="36.0">
          <cursor>
             <Cursor fx:constant="DEFAULT" />
          </cursor>
+         <graphic>
+            <ImageView fitHeight="29.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@SoundOn.png" />
+               </image>
+            </ImageView>
+         </graphic>
       </Button>
       <HBox fx:id="hstack" alignment="BOTTOM_CENTER" layoutX="444.0" layoutY="796.0" prefHeight="95.0" prefWidth="1033.0" AnchorPane.bottomAnchor="189.0" AnchorPane.leftAnchor="444.0" AnchorPane.rightAnchor="443.0" AnchorPane.topAnchor="796.0" />
       <HBox fx:id="hstack2" layoutX="447.0" layoutY="896.0" prefHeight="95.0" prefWidth="1029.0" />
