@@ -3,8 +3,12 @@ package com.moritzschaub;
 import javafx.event.*;
 import javafx.fxml.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.shape.Circle;
 import javafx.scene.*;
 import javafx.stage.Stage;
+import javafx.scene.shape.Rectangle;
 
 public class FirstController {
 
@@ -15,7 +19,7 @@ public class FirstController {
     private Label label;
 
     @FXML
-    private Button buttonstart;
+    private Button buttonstart, buttonregeln;
 
     private Scene firstScene;
 
@@ -57,10 +61,31 @@ public class FirstController {
         // TODO: move to regeln scene
     }
 
-    public void initialize() {
-        // TODO
+    public ImageView customImageView(String url) {
+        int width = 155;
+        int height = 80;
 
+        // create image
+        Image img = new Image(url, width, height, true, true);
+
+        // create the rect
+        Rectangle rect = new Rectangle(width, height);
+        // rounded corners
+        rect.setArcHeight(10.0d);
+        rect.setArcWidth(10.0d);
+
+        // create ImageView
+        ImageView view = new ImageView(img);
+        view.setClip(rect);
+
+        return view;
     }
 
+    public void initialize() {
+
+        buttonregeln.setGraphic(customImageView("/Regeln.png"));
+        buttonstart.setGraphic(customImageView("/Start.png"));
+
+    }
 
 }

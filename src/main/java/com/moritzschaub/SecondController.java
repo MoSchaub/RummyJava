@@ -38,6 +38,12 @@ public class SecondController {
         @FXML
         private GridPane tableGrid;
 
+        @FXML
+        private ImageView avatarView;
+
+        @FXML
+        private Circle avatarCircle;
+
         public void initialize() {
                 draggingStone = new Stone(Stone.Color.GREEN, 666);
                 draggingRectangle = new Rectangle();
@@ -57,6 +63,10 @@ public class SecondController {
                 new Thread(() -> {
                         this.updateStones();
                 }).run();
+
+                Image image = new Image("StockCharaktere/Figur1.png", 216, 216, true, true);
+                avatarView.setImage(image);
+                avatarView.setClip(avatarCircle);
         }
 
         private void setUpTischGrid() {

@@ -2,14 +2,14 @@
 
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.moritzschaub.SecondController">
    <children>
@@ -18,17 +18,19 @@
             <Image url="@HintergrundSpiel.jpg" />
          </image>
       </ImageView>
-      <Button fx:id="ziehenButton" alignment="CENTER" layoutX="1719.0" layoutY="933.0" mnemonicParsing="false" onAction="#ziehen" prefHeight="65.0" prefWidth="120.0" text="Ziehen" AnchorPane.bottomAnchor="150.0" AnchorPane.rightAnchor="80.0">
+      <Button fx:id="ziehenButton" alignment="CENTER" layoutX="1719.0" layoutY="933.0" mnemonicParsing="false" onAction="#ziehen" prefHeight="65.0" prefWidth="120.0" style="-fx-background-color: #E70001;" text="Ziehen" textFill="WHITE" AnchorPane.bottomAnchor="150.0" AnchorPane.rightAnchor="80.0">
          <cursor>
             <Cursor fx:constant="DEFAULT" />
-         </cursor></Button>
-      <SplitMenuButton layoutX="13.0" layoutY="18.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="197.0" text="Spieleeinstellungen" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="40.0">
-        <items>
-          <MenuItem mnemonicParsing="false" text="s" />
-          <MenuItem mnemonicParsing="false" onAction="#openFirstScene" text="Spiel verlassen" />
-        </items>
-      </SplitMenuButton>
-      <Button fx:id="soundButton" layoutX="1755.0" layoutY="36.0" onAction="#toggleSoundHandler"  mnemonicParsing="false" prefHeight="51.0" prefWidth="51.0" AnchorPane.rightAnchor="114.0" AnchorPane.topAnchor="36.0">
+         </cursor>
+         <font>
+            <Font name="Futura Medium" size="18.0" />
+         </font></Button>
+      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#openFirstScene" style="-fx-background-color: #E70001;" text="Spiel verlassen" textFill="WHITE" textOverrun="CLIP">
+         <font>
+            <Font name="Futura Medium" size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="soundButton" layoutX="1755.0" layoutY="36.0" mnemonicParsing="false" onAction="#toggleSoundHandler" prefHeight="51.0" prefWidth="51.0" style="-fx-background-color: #E70001;" textFill="WHITE" AnchorPane.rightAnchor="114.0" AnchorPane.topAnchor="36.0">
          <cursor>
             <Cursor fx:constant="DEFAULT" />
          </cursor>
@@ -40,12 +42,14 @@
             </ImageView>
          </graphic>
       </Button>
-      <HBox fx:id="hstack" alignment="BOTTOM_CENTER" layoutX="444.0" layoutY="796.0" prefHeight="95.0" prefWidth="1033.0" AnchorPane.bottomAnchor="189.0" AnchorPane.leftAnchor="444.0" AnchorPane.rightAnchor="443.0" AnchorPane.topAnchor="796.0" />
+      <HBox fx:id="hstack" alignment="BOTTOM_CENTER" layoutX="444.0" layoutY="796.0" prefHeight="95.0" prefWidth="1033.0" />
       <HBox fx:id="hstack2" layoutX="447.0" layoutY="896.0" prefHeight="95.0" prefWidth="1029.0" />
       <GridPane fx:id="tableGrid" gridLinesVisible="true" layoutX="862.0" layoutY="495.0" prefHeight="30.0" prefWidth="51.0">
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
+      <Circle fx:id="avatarImage" fill="#1f93ff00" layoutX="177.0" layoutY="896.0" opacity="0.0" radius="108.0" stroke="BLACK" strokeType="INSIDE" />
+      <ImageView fx:id="avatarView" fitHeight="216.0" fitWidth="216.0" layoutX="72.0" layoutY="790.0" pickOnBounds="true" preserveRatio="true" />
    </children>
 </AnchorPane>
