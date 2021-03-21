@@ -9,7 +9,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.control.*;
 import javafx.fxml.*;
-import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.stage.*;
 
@@ -22,8 +21,7 @@ public class SecondController {
         private int playerId;
         private ArrayList<StoneRectangle> rectangles;
         private boolean sound;
-        private Stone draggingStone;
-        private Rectangle draggingRectangle;
+        private StoneRectangle draggingRectangle;
 
         @FXML
         private HBox hstack, hstack2;
@@ -44,10 +42,10 @@ public class SecondController {
         private Circle avatarCircle;
 
         public void initialize() {
-                sound = true;
-                draggingStone = new Stone(Stone.Color.GREEN, 666);
-                draggingRectangle = new Rectangle();
+                draggingRectangle = null;
                 setUpTischGrid();
+                updateSoundButtonImage();
+                setCharacterImage();
         }
 
         public void setUpStones() {
@@ -62,9 +60,6 @@ public class SecondController {
 
                 new Thread(this::updateStones).run();
 
-                Image image = new Image("StockCharaktere/Figur1.png", 216, 216, true, true);
-                avatarView.setImage(image);
-                avatarView.setClip(avatarCircle);
         }
 
         private void setUpTischGrid() {
@@ -78,53 +73,74 @@ public class SecondController {
 
         private void handleDropForGrid(DragEvent event) {
                 if (event.getDragboard().hasImage()) {
-                        //get drop location
-                        double positionX = event.getX();
-                        double positionY = event.getY();
-
-                        //get cell for location
-                        double cellWidth = tableGrid.getWidth() / (2 * tableGrid.getRowCount());
-                        double cellHeight = 2 * tableGrid.getHeight() / tableGrid.getColumnCount();
-
-                        int columnNumber = roundedUp(positionX/cellWidth) -1;
-                        int rowNumber = roundedUp(positionY/cellHeight) -1 ;
-
                         // remove rect from hstack and add it to the grid
                         if (hstack.getChildren().contains(draggingRectangle)) {
-                                hstack.getChildren().remove(draggingRectangle);
+                                if (hstack.getChildren().remove(draggingRectangle)) {
+                                        rectangles.remove(draggingRectangle);
+                                        addingRectToGridHelper(event);
+                                }
 
                         } else if (hstack2.getChildren().contains(draggingRectangle)) {
-                                hstack2.getChildren().remove(draggingRectangle);
+                                if (hstack2.getChildren().remove(draggingRectangle)) {
+                                        rectangles.remove(draggingRectangle);
+                                        addingRectToGridHelper(event);
+                                }
 
-                        } else tableGrid.getChildren().remove(draggingRectangle);
-
-                        //add the stone
-                        game.legeStein(draggingStone, game.getPlayer(playerId), rowNumber, columnNumber);
-                        draggingStone = null;
-
-                        GridPane.setRowIndex(draggingRectangle, rowNumber);
-                        GridPane.setColumnIndex(draggingRectangle, columnNumber);
-                        tableGrid.getChildren().add(draggingRectangle);
-
-                        draggingRectangle = null;
+                        } else {
+                                tableGrid.getChildren().remove(draggingRectangle);
+                                addingRectToGridHelper(event);
+                        }
                 }
+        }
+
+        private void addingRectToGridHelper(DragEvent event) {
+
+                // get drop location
+                double positionX = event.getX();
+                double positionY = event.getY();
+
+                // get cell for location
+                double cellWidth = tableGrid.getWidth() / (2 * tableGrid.getRowCount());
+                double cellHeight = 2 * tableGrid.getHeight() / tableGrid.getColumnCount();
+
+                int columnNumber = roundedUp(positionX / cellWidth) - 1;
+                int rowNumber = roundedUp(positionY / cellHeight) - 1;
+
+                // add the stone
+                game.legeStein(draggingRectangle.getStone(), game.getPlayer(playerId), rowNumber, columnNumber);
+
+                GridPane.setRowIndex(draggingRectangle, rowNumber);
+                GridPane.setColumnIndex(draggingRectangle, columnNumber);
+
+                System.out.println(cellWidth);
+
+                draggingRectangle.setWidth(cellWidth);
+                draggingRectangle.setHeight(draggingRectangle.getWidth() / 0.74);
+
+                Image draggingImage = new Image(draggingRectangle.getStone().getFilePath(),
+                                draggingRectangle.getWidth(), draggingRectangle.getHeight(), true, true);
+                draggingRectangle.setImage(draggingImage);
+
+                tableGrid.getChildren().add(draggingRectangle);
+
+                draggingRectangle = null;
         }
 
         private void allowForMoving(DragEvent event) {
                 if (event.getGestureSource() != tableGrid && event.getDragboard().hasImage()
-                        && event.getTarget() == tableGrid) {
+                                && event.getTarget() == tableGrid) {
                         /* allow for moving */
                         event.acceptTransferModes(TransferMode.MOVE);
                 }
         }
 
-        //rounds double to an int to the next highest int
+        // rounds double to an int to the next highest int
         // e. g. 0.1 returns 1; 5.9 -> 6
         private int roundedUp(double d) {
                 int i = 0;
                 while (d > 0) {
-                       d--;
-                       i++;
+                        d--;
+                        i++;
                 }
                 return i;
         }
@@ -138,11 +154,11 @@ public class SecondController {
                 double width;
                 double height;
 
-                if (player.getHand().size() <= 30) {
+                if (rectangles.size() <= 30) {
                         width = 68;
                 } else {
-                        width = (2 * 1033) / (player.getHand().size() + 1);
-                        System.out.println(player.getHand().size());
+                        width = (2 * 1033) / (rectangles.size() + 1);
+                        System.out.println(rectangles.size());
                 }
 
                 height = width / 0.74;
@@ -162,13 +178,17 @@ public class SecondController {
                                         rect.setWidth(width);
                                         rect.setHeight(height);
 
+                                        Image newImage = new Image(stone.getFilePath(), rect.getWidth(),
+                                                        rect.getHeight(), true, true);
+                                        rect.setImage(newImage);
+
                                 }
                         } else {
 
                                 rect = new StoneRectangle(stone, width, height); // create new rect for the stone
                                 rectangles.add(rect);
 
-                                //add rectangles to the view
+                                // add rectangles to the view
                                 if (hstack.getChildren().size() < 15) {
                                         hstack.getChildren().add(rect);
                                 } else {
@@ -180,11 +200,12 @@ public class SecondController {
                                 }
 
                                 // set the image for the rect
-                                Image image = new Image(stone.getFilePath());
-                                rect.setFill(new ImagePattern(image));
+                                Image image = new Image(stone.getFilePath(), rect.getWidth(), rect.getHeight(), true,
+                                                true);
+                                rect.setImage(image);
                         }
 
-                        rect.setOnDragDetected( (event) -> {
+                        rect.setOnDragDetected((event) -> {
                                 handleRectDrag(event, rect);
                         });
 
@@ -201,8 +222,7 @@ public class SecondController {
                         /* Put a string on a dragboard */
                         ClipboardContent content = new ClipboardContent();
 
-                        Image clipImage = new Image(rect.getStone().getFilePath(), rect.getWidth(), rect.getHeight(), true, true);
-                        draggingStone = rect.getStone();
+                        Image clipImage = rect.getImage();
                         draggingRectangle = rect;
 
                         rect.setImage(clipImage);
@@ -216,6 +236,11 @@ public class SecondController {
 
         @FXML
         public void ziehen(ActionEvent actionEvent) {
+                ziehen();
+        }
+
+        private void ziehen() {
+
                 Player player = game.getPlayer(playerId);
                 game.zieheStein(player);
                 this.updateStones();
@@ -248,6 +273,11 @@ public class SecondController {
                 sound = !sound;
 
                 // change the image
+                updateSoundButtonImage();
+
+        }
+
+        private void updateSoundButtonImage() {
                 Image soundOffImage = new Image(getClass().getResource("/SoundOff.png").toString());
                 Image soundOnImage = new Image(getClass().getResource("/SoundOn.png").toString());
                 if (!sound) {
@@ -257,7 +287,13 @@ public class SecondController {
                         ImageView imageView = (ImageView) this.soundButton.getGraphic();// getChildren().get(0)
                         imageView.setImage(soundOnImage);
                 }
+        }
 
+        private void setCharacterImage() {
+
+                Image image = new Image("StockCharaktere/Figur1.png", 216, 216, true, true);
+                avatarView.setImage(image);
+                avatarView.setClip(avatarCircle);
         }
 
         public void openFirstScene(ActionEvent actionEvent) {
