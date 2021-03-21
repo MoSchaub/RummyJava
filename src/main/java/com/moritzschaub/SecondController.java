@@ -138,9 +138,12 @@ public class SecondController {
                 double width;
                 double height;
 
-                if (player.getHand().size() < 30) {
+                if (player.getHand().size() <= 30) {
                         width = 68;
-                } else width = (2 * 1033) / (player.getHand().size() + 1);
+                } else {
+                        width = (2 * 1033) / (player.getHand().size() + 1);
+                        System.out.println(player.getHand().size());
+                }
 
                 height = width / 0.74;
 
@@ -155,7 +158,7 @@ public class SecondController {
 
                                 // old rect update it
                                 rect = rectangles.get(i);
-                                if (player.getHand().contains(rect.stone)) {
+                                if (player.getHand().contains(rect.getStone())) {
                                         rect.setWidth(width);
                                         rect.setHeight(height);
 
@@ -198,11 +201,13 @@ public class SecondController {
                         /* Put a string on a dragboard */
                         ClipboardContent content = new ClipboardContent();
 
-                        Image clipImage = new Image(rect.stone.getFilePath(), rect.getWidth(), rect.getHeight(), true, true);
-                        draggingStone = rect.stone;
+                        Image clipImage = new Image(rect.getStone().getFilePath(), rect.getWidth(), rect.getHeight(), true, true);
+                        draggingStone = rect.getStone();
                         draggingRectangle = rect;
 
-                        content.putImage(clipImage);
+                        rect.setImage(clipImage);
+
+                        content.putImage(rect.getImage());
                         db.setContent(content);
 
                         event.consume();
