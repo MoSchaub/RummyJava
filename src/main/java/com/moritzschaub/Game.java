@@ -5,7 +5,7 @@ import java.util.Stack;
 import java.util.Random;
 
 public class Game {
-    private ArrayList<Reihe> tisch;
+    private Stone[][] tisch;
     private ArrayList<Player> players;
     private Stack<Stone> beutel;
     private boolean gameRunning;
@@ -13,7 +13,7 @@ public class Game {
 
     public Game(ArrayList<Player> players) {
         this.players = players;
-        this.tisch = new ArrayList<Reihe>();
+        this.tisch = new Stone[10][20];
         this.beutel = new Stack<Stone>();
         this.gameRunning = false;
         this.random = new Random();
@@ -21,7 +21,7 @@ public class Game {
 
     public Game() {
         this.players = new ArrayList<Player>();
-        this.tisch = new ArrayList<Reihe>();
+        this.tisch = new Stone[10][20];
         this.beutel = new Stack<Stone>();
         this.gameRunning = false;
         this.random = new Random();
@@ -56,15 +56,14 @@ public class Game {
         return stone;
     }
 
-    public void legeStein(Stone stone, Player player, Reihe reihe) {
-        if (tisch.contains(reihe)) {
+    public void legeStein(Stone stone, Player player, int row, int column) {
+        if (tisch[row][column] == null) {
 
             // remove the stone
             player.getHand().remove(stone);
 
-            // add the stone
-            int index = tisch.indexOf(reihe);
-            tisch.get(index).getStones().add(stone);
+            //set the stone
+            tisch[row][column] = stone;
         }
     }
 
@@ -72,11 +71,11 @@ public class Game {
         this.gameRunning = true;
     }
 
-    public void neueReiheMitSteinen(ArrayList<Stone> steine) {
+    /*public void neueReiheMitSteinen(ArrayList<Stone> steine) {
         Reihe reihe = new Reihe();
         reihe.getStones().addAll(steine);
         this.tisch.add(reihe);
-    }
+    }*/
 
     public Player getPlayer(int id) {
         for (int i = 0; i < players.size(); i++) {
@@ -87,7 +86,7 @@ public class Game {
         return null;
     }
 
-    public ArrayList<Reihe> getTisch() {
+    public Stone[][] getTisch() {
         return this.tisch;
     }
 

@@ -12,7 +12,6 @@ import javafx.fxml.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.stage.*;
-import javafx.scene.media.*;
 
 import java.util.ArrayList;
 
@@ -45,13 +44,14 @@ public class SecondController {
         private Circle avatarCircle;
 
         public void initialize() {
+                sound = true;
                 draggingStone = new Stone(Stone.Color.GREEN, 666);
                 draggingRectangle = new Rectangle();
                 setUpTischGrid();
         }
 
         public void setUpStones() {
-                this.rectangles = new ArrayList<StoneRectangle>();
+                this.rectangles = new ArrayList<>();
 
                 // empty the hstack
                 hstack.getChildren().clear();
@@ -60,9 +60,7 @@ public class SecondController {
                 hstack2.getChildren().clear();
                 hstack2.setSpacing(0);
 
-                new Thread(() -> {
-                        this.updateStones();
-                }).run();
+                new Thread(this::updateStones).run();
 
                 Image image = new Image("StockCharaktere/Figur1.png", 216, 216, true, true);
                 avatarView.setImage(image);
@@ -73,46 +71,62 @@ public class SecondController {
 
                 tableGrid.setGridLinesVisible(true);
 
-                tableGrid.setOnDragOver(new EventHandler<DragEvent>() {
-                        public void handle(DragEvent event) {
-                                /* data is dragged over the target */
-                                /*
-                                 * accept it only if it is not dragged from the same node and if it has a string
-                                 * data
-                                 */
-                                if (event.getGestureSource() != tableGrid && event.getDragboard().hasImage()
-                                                && event.getTarget() == tableGrid) {
-                                        /* allow for moving */
-                                        event.acceptTransferModes(TransferMode.MOVE);
+                tableGrid.setOnDragDropped(this::handleDropForGrid);
 
-                                        ArrayList<Stone> steine = new ArrayList<Stone>();
-                                        steine.add(draggingStone);
-                                        game.neueReiheMitSteinen(steine);
+                tableGrid.setOnDragOver(this::allowForMoving);
+        }
 
-                                        for (int i = 0; i < game.getTisch().size(); i++) {
-                                                for (int j = 0; j < game.getTisch().get(i).getStones().size(); i++) {
-                                                        if (hstack.getChildren().remove(draggingRectangle)) {
-                                                                tableGrid.setConstraints(draggingRectangle, i, j);
-                                                                tableGrid.addRow(j, draggingRectangle);
-                                                                updateStones();
-                                                        }
-                                                }
-                                        }
-                                        // remove rect from hstack and add it to the grid
-                                        // hstack.getChildren().remove(draggingRectangle);
-                                        // tableGrid.getChildren().add(draggingRectangle);
+        private void handleDropForGrid(DragEvent event) {
+                if (event.getDragboard().hasImage()) {
+                        //get drop location
+                        double positionX = event.getX();
+                        double positionY = event.getY();
 
-                                        // draggingRectangle = null;
+                        //get cell for location
+                        double cellWidth = tableGrid.getWidth() / (2 * tableGrid.getRowCount());
+                        double cellHeight = 2 * tableGrid.getHeight() / tableGrid.getColumnCount();
 
-                                        // TODO: tell the game to remove it from the players hand and add it to the
-                                        // table
-                                        // TODO: update the grid view
+                        int columnNumber = roundedUp(positionX/cellWidth) -1;
+                        int rowNumber = roundedUp(positionY/cellHeight) -1 ;
 
-                                }
+                        // remove rect from hstack and add it to the grid
+                        if (hstack.getChildren().contains(draggingRectangle)) {
+                                hstack.getChildren().remove(draggingRectangle);
 
-                                event.consume();
-                        }
-                });
+                        } else if (hstack2.getChildren().contains(draggingRectangle)) {
+                                hstack2.getChildren().remove(draggingRectangle);
+
+                        } else tableGrid.getChildren().remove(draggingRectangle);
+
+                        //add the stone
+                        game.legeStein(draggingStone, game.getPlayer(playerId), rowNumber, columnNumber);
+                        draggingStone = null;
+
+                        GridPane.setRowIndex(draggingRectangle, rowNumber);
+                        GridPane.setColumnIndex(draggingRectangle, columnNumber);
+                        tableGrid.getChildren().add(draggingRectangle);
+
+                        draggingRectangle = null;
+                }
+        }
+
+        private void allowForMoving(DragEvent event) {
+                if (event.getGestureSource() != tableGrid && event.getDragboard().hasImage()
+                        && event.getTarget() == tableGrid) {
+                        /* allow for moving */
+                        event.acceptTransferModes(TransferMode.MOVE);
+                }
+        }
+
+        //rounds double to an int to the next highest int
+        // e. g. 0.1 returns 1; 5.9 -> 6
+        private int roundedUp(double d) {
+                int i = 0;
+                while (d > 0) {
+                       d--;
+                       i++;
+                }
+                return i;
         }
 
         private void updateStones() {
@@ -125,10 +139,8 @@ public class SecondController {
                 double height;
 
                 if (player.getHand().size() < 30) {
-                        width = 1033 / 15;
-                } else {
-                        width = 2 * 1033 / (player.getHand().size() + 1);
-                }
+                        width = 68;
+                } else width = (2 * 1033) / (player.getHand().size() + 1);
 
                 height = width / 0.74;
 
@@ -152,6 +164,8 @@ public class SecondController {
 
                                 rect = new StoneRectangle(stone, width, height); // create new rect for the stone
                                 rectangles.add(rect);
+
+                                //add rectangles to the view
                                 if (hstack.getChildren().size() < 15) {
                                         hstack.getChildren().add(rect);
                                 } else {
@@ -167,40 +181,39 @@ public class SecondController {
                                 rect.setFill(new ImagePattern(image));
                         }
 
-                        rect.setOnDragDetected(new EventHandler<MouseEvent>() {
-                                public void handle(MouseEvent event) {
-                                        if (event.getSource() != tableGrid) {
-                                                /* drag was detected, start a drag-and-drop gesture */
-                                                /* allow any transfer mode */
-                                                Dragboard db = rect.startDragAndDrop(TransferMode.ANY);
-
-                                                /* Put a string on a dragboard */
-                                                ClipboardContent content = new ClipboardContent();
-
-                                                Image clipImage = new Image(stone.getFilePath(), width, height, true,
-                                                                true);
-                                                draggingStone = stone;
-                                                draggingRectangle = rect;
-
-                                                content.putImage(clipImage);
-                                                db.setContent(content);
-
-                                                event.consume();
-                                        }
-                                }
+                        rect.setOnDragDetected( (event) -> {
+                                handleRectDrag(event, rect);
                         });
 
                 }
 
         }
 
+        private void handleRectDrag(MouseEvent event, StoneRectangle rect) {
+                if (event.getSource() != tableGrid) {
+                        /* drag was detected, start a drag-and-drop gesture */
+                        /* allow any transfer mode */
+                        Dragboard db = rect.startDragAndDrop(TransferMode.ANY);
+
+                        /* Put a string on a dragboard */
+                        ClipboardContent content = new ClipboardContent();
+
+                        Image clipImage = new Image(rect.stone.getFilePath(), rect.getWidth(), rect.getHeight(), true, true);
+                        draggingStone = rect.stone;
+                        draggingRectangle = rect;
+
+                        content.putImage(clipImage);
+                        db.setContent(content);
+
+                        event.consume();
+                }
+        }
+
         @FXML
         public void ziehen(ActionEvent actionEvent) {
                 Player player = game.getPlayer(playerId);
                 game.zieheStein(player);
-                new Thread(() -> {
-                        this.updateStones();
-                }).run();
+                this.updateStones();
 
                 if (this.sound) {
                         new Thread(() -> {
@@ -232,7 +245,7 @@ public class SecondController {
                 // change the image
                 Image soundOffImage = new Image(getClass().getResource("/SoundOff.png").toString());
                 Image soundOnImage = new Image(getClass().getResource("/SoundOn.png").toString());
-                if (sound) {
+                if (!sound) {
                         ImageView imageView = (ImageView) this.soundButton.getGraphic();// getChildren().get(0)
                         imageView.setImage(soundOffImage);
                 } else {
@@ -243,7 +256,7 @@ public class SecondController {
         }
 
         public void openFirstScene(ActionEvent actionEvent) {
-                Stage primaryStage = (Stage) ((Node) ziehenButton).getScene().getWindow();
+                Stage primaryStage = (Stage) ziehenButton.getScene().getWindow();
                 primaryStage.setScene(firstScene);
         }
 
