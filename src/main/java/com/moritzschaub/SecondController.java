@@ -154,7 +154,7 @@ public class SecondController {
                 double width;
                 double height;
 
-                if (rectangles.size() <= 30) {
+                if (rectangles.size() < 30) {
                         width = 68;
                 } else {
                         width = (2 * 1033) / (rectangles.size() + 1);
